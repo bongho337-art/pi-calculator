@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PI 환율 계산기</title>
+  <!-- Pi SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       min-height: 100vh;
       background: linear-gradient(150deg, #120740 0%, #2D1280 40%, #5A28A8 75%, #7B44CC 100%);
@@ -14,8 +15,6 @@
       color: #fff;
       padding: 24px 16px 40px;
     }
-
-    /* ── Header ── */
     .header { text-align: center; margin-bottom: 28px; }
     .pi-orb {
       width: 80px; height: 80px;
@@ -28,8 +27,6 @@
     }
     h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
     .subtitle { font-size: 13px; color: rgba(255,255,255,0.6); }
-
-    /* ── Input Card ── */
     .input-card {
       background: rgba(255,255,255,0.09);
       border-radius: 22px;
@@ -58,7 +55,6 @@
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
     .pi-unit { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.45); flex-shrink: 0; }
-
     .status-bar {
       margin-top: 14px; padding-top: 12px;
       border-top: 1px solid rgba(255,255,255,0.09);
@@ -69,13 +65,10 @@
     .price-num { color: #FFD700; font-size: 15px; font-weight: 700; }
     .price-src { font-size: 10px; color: rgba(255,255,255,0.38); margin-left: 6px; }
     .time-text { font-size: 11px; color: rgba(255,255,255,0.38); }
-
-    /* ── Grid ── */
     .grid {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 10px; margin-bottom: 18px;
     }
-
     .card {
       background: rgba(255,255,255,0.07);
       border-radius: 18px;
@@ -88,7 +81,6 @@
       background: linear-gradient(140deg, rgba(255,215,0,0.18), rgba(255,140,0,0.10));
       border: 1.5px solid rgba(255,215,0,0.42);
     }
-
     .badge {
       position: absolute; top: 8px; right: 10px;
       font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
@@ -97,7 +89,6 @@
       padding: 2px 7px; border-radius: 20px;
     }
     .card.krw .badge { color: #FFD700; background: rgba(255,215,0,0.14); }
-
     .flag-row {
       display: flex; align-items: center; gap: 8px;
       margin-bottom: 10px; padding-right: 40px;
@@ -105,7 +96,6 @@
     .flag { font-size: 22px; }
     .code { font-size: 14px; font-weight: 800; line-height: 1; }
     .name { font-size: 10px; color: rgba(255,255,255,0.48); margin-top: 2px; }
-
     .value {
       font-weight: 800; font-size: 20px; color: #fff;
       letter-spacing: -0.5px;
@@ -114,39 +104,70 @@
     .card.krw .value { color: #FFD700; }
     .val-sym { font-size: 11px; font-weight: 600; opacity: 0.65; }
     .dim { color: rgba(255,255,255,0.28); font-size: 11px; font-weight: 400; }
-
-    /* ── Refresh ── */
     .refresh-btn {
-      display: block; margin: 0 auto;
+      display: block; margin: 0 auto 12px;
       background: linear-gradient(135deg, #FFD700, #FF8C00);
       color: #1E0A50; border: none; border-radius: 50px;
       padding: 13px 40px; font-size: 14px; font-weight: 800;
       cursor: pointer; letter-spacing: 0.3px;
       box-shadow: 0 6px 20px rgba(255,200,0,0.35);
-      font-family: inherit;
-      transition: opacity 0.2s;
+      font-family: inherit; transition: opacity 0.2s;
     }
     .refresh-btn:disabled {
       background: rgba(255,255,255,0.15);
       color: rgba(255,255,255,0.4);
       box-shadow: none; cursor: not-allowed;
     }
+
+    /* ── 후원 섹션 ── */
+    .donate-card {
+      background: rgba(255,255,255,0.07);
+      border-radius: 22px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.15);
+      margin-bottom: 16px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+    .donate-title {
+      font-size: 14px; font-weight: 700; margin-bottom: 6px;
+      color: rgba(255,255,255,0.85);
+    }
+    .donate-desc {
+      font-size: 12px; color: rgba(255,255,255,0.5);
+      margin-bottom: 14px; line-height: 1.5;
+    }
+    .donate-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #9B59B6, #6C3483);
+      color: #fff; border: none; border-radius: 50px;
+      padding: 12px 32px; font-size: 14px; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.3px;
+      box-shadow: 0 4px 16px rgba(100,50,200,0.4);
+      font-family: inherit; transition: opacity 0.2s;
+    }
+    .donate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .donate-status {
+      margin-top: 10px; font-size: 12px;
+      color: rgba(255,255,255,0.6); min-height: 18px;
+    }
+    .donate-status.success { color: #2ECC71; font-weight: 700; }
+    .donate-status.error   { color: #E74C3C; }
+
     .footer {
-      text-align: center; margin-top: 12px;
+      text-align: center; margin-top: 4px;
       font-size: 11px; color: rgba(255,255,255,0.35); line-height: 1.7;
     }
   </style>
 </head>
 <body>
 
-<!-- ── Header ── -->
 <div class="header">
   <div class="pi-orb">π</div>
   <h1>PI 환율 계산기</h1>
   <p class="subtitle">BIS 글로벌 거래량 상위 9위 + 🇰🇷 KRW 실시간 환율</p>
 </div>
 
-<!-- ── Input ── -->
 <div class="input-card">
   <div class="input-label">보유 PI 수량 입력</div>
   <div class="input-row">
@@ -160,17 +181,25 @@
   </div>
 </div>
 
-<!-- ── Currency Grid ── -->
 <div class="grid" id="grid"></div>
 
-<!-- ── Refresh ── -->
 <button class="refresh-btn" id="refreshBtn" onclick="fetchAll()">🔄 환율 새로고침</button>
+
+<!-- ── 후원 섹션 ── -->
+<div class="donate-card">
+  <div class="donate-title">💜 이 앱이 도움이 되셨나요?</div>
+  <div class="donate-desc">Pi Browser에서 소액(0.01 PI)으로 후원해 주세요<br>개발자에게 큰 힘이 됩니다!</div>
+  <button class="donate-btn" id="donateBtn" onclick="donate()">π 0.01 PI 후원하기</button>
+  <div class="donate-status" id="donateStatus"></div>
+</div>
+
 <p class="footer">
   60초마다 자동 업데이트<br>
   시세: CoinGecko &nbsp;·&nbsp; 환율: Open Exchange Rates
 </p>
 
 <script>
+// ── 통화 목록 ──
 const CURRENCIES = [
   { code:'USD', name:'미국 달러',   flag:'🇺🇸', sym:'$',   rank:1,   dec:4 },
   { code:'EUR', name:'유로',        flag:'🇪🇺', sym:'€',   rank:2,   dec:4 },
@@ -184,12 +213,10 @@ const CURRENCIES = [
   { code:'KRW', name:'한국 원',     flag:'🇰🇷', sym:'₩',  rank:'★', dec:0 },
 ];
 
-let piUsd = null, rates = null, lastUpdated = null;
+let piUsd = null, rates = null;
 
-// ── 그리드 초기 렌더링 ──
 function buildGrid() {
-  const grid = document.getElementById('grid');
-  grid.innerHTML = CURRENCIES.map(c => {
+  document.getElementById('grid').innerHTML = CURRENCIES.map(c => {
     const isKrw = c.code === 'KRW';
     return `
       <div class="card${isKrw ? ' krw' : ''}" id="card-${c.code}">
@@ -201,14 +228,11 @@ function buildGrid() {
             <div class="name">${c.name}</div>
           </div>
         </div>
-        <div class="value" id="val-${c.code}">
-          <span class="dim">로딩중…</span>
-        </div>
+        <div class="value" id="val-${c.code}"><span class="dim">로딩중…</span></div>
       </div>`;
   }).join('');
 }
 
-// ── 값 포매팅 ──
 function fmt(v, dec) {
   if (v === null || isNaN(v)) return null;
   return new Intl.NumberFormat('ko-KR', {
@@ -217,39 +241,29 @@ function fmt(v, dec) {
   }).format(v);
 }
 
-// ── 화면 업데이트 ──
 function render() {
   const amt = parseFloat(document.getElementById('piInput').value);
   const hasAmt = !isNaN(amt) && amt > 0;
-
   CURRENCIES.forEach(c => {
     const el = document.getElementById('val-' + c.code);
     if (!el) return;
-    if (!piUsd || !rates) {
-      el.innerHTML = '<span class="dim">로딩중…</span>'; return;
-    }
-    if (!hasAmt) {
-      el.innerHTML = '<span class="dim">수량 입력</span>'; return;
-    }
+    if (!piUsd || !rates) { el.innerHTML = '<span class="dim">로딩중…</span>'; return; }
+    if (!hasAmt) { el.innerHTML = '<span class="dim">수량 입력</span>'; return; }
     const raw = amt * piUsd * (rates[c.code] || 0);
     const v = fmt(raw, c.dec);
     if (!v) { el.innerHTML = '<span class="dim">—</span>'; return; }
-    // 자릿수에 따라 폰트 크기 조정
     const fs = v.length > 12 ? '13px' : v.length > 8 ? '16px' : '20px';
     el.style.fontSize = fs;
     el.innerHTML = `<span class="val-sym">${c.sym}</span><span>${v}</span>`;
   });
 }
 
-// ── PI 가격 가져오기 ──
 async function fetchPiPrice() {
   const ids = ['pi-network', 'pi-network-iou'];
   for (const id of ids) {
     try {
-      const r = await fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`,
-        { signal: AbortSignal.timeout(6000) }
-      );
+      const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`,
+        { signal: AbortSignal.timeout(6000) });
       if (r.ok) {
         const d = await r.json();
         const p = d[id]?.usd;
@@ -260,7 +274,6 @@ async function fetchPiPrice() {
   return { price: null, src: null };
 }
 
-// ── 환율 가져오기 ──
 async function fetchRates() {
   try {
     const r = await fetch('https://open.er-api.com/v6/latest/USD',
@@ -273,15 +286,11 @@ async function fetchRates() {
   return null;
 }
 
-// ── 전체 데이터 가져오기 ──
 async function fetchAll() {
   const btn = document.getElementById('refreshBtn');
-  btn.disabled = true;
-  btn.textContent = '⏳ 업데이트 중…';
+  btn.disabled = true; btn.textContent = '⏳ 업데이트 중…';
   document.getElementById('statusLeft').textContent = '⏳ 실시간 데이터 불러오는 중…';
-
   const [piResult, ratesResult] = await Promise.all([fetchPiPrice(), fetchRates()]);
-
   if (piResult.price) {
     piUsd = piResult.price;
     document.getElementById('statusLeft').innerHTML =
@@ -291,19 +300,69 @@ async function fetchAll() {
     document.getElementById('statusLeft').innerHTML =
       '<span style="color:#FF7043">⚠️ PI 가격을 불러올 수 없습니다</span>';
   }
-
   if (ratesResult) rates = ratesResult;
-
-  lastUpdated = new Date();
-  document.getElementById('statusRight').textContent =
-    '🕐 ' + lastUpdated.toLocaleTimeString('ko-KR');
-
+  const now = new Date();
+  document.getElementById('statusRight').textContent = '🕐 ' + now.toLocaleTimeString('ko-KR');
   render();
-  btn.disabled = false;
-  btn.textContent = '🔄 환율 새로고침';
+  btn.disabled = false; btn.textContent = '🔄 환율 새로고침';
 }
 
-// ── 시작 ──
+// ── Pi SDK 결제 ──
+let piReady = false;
+try {
+  Pi.init({ version: "2.0", sandbox: false });
+  piReady = true;
+} catch(e) {
+  console.log('Pi SDK not available (open in Pi Browser)');
+}
+
+async function donate() {
+  const btn = document.getElementById('donateBtn');
+  const status = document.getElementById('donateStatus');
+  if (!piReady) {
+    status.textContent = '⚠️ Pi Browser에서 열어주세요!';
+    status.className = 'donate-status error';
+    return;
+  }
+  try {
+    btn.disabled = true;
+    status.textContent = '🔐 Pi 계정 인증 중…';
+    status.className = 'donate-status';
+    await Pi.authenticate(['username', 'payments'], () => {});
+    status.textContent = '💳 결제 진행 중…';
+    Pi.createPayment({
+      amount: 0.01,
+      memo: "PI 환율 계산기 후원",
+      metadata: { app: "pi-calculator" }
+    }, {
+      onReadyForServerApproval: async (paymentId) => {
+        status.textContent = '✅ 결제 승인 중…';
+        await fetch('/api/payment?action=approve&paymentId=' + paymentId);
+      },
+      onReadyForServerCompletion: async (paymentId, txid) => {
+        await fetch('/api/payment?action=complete&paymentId=' + paymentId + '&txid=' + txid);
+        status.textContent = '🎉 후원 완료! 감사합니다!';
+        status.className = 'donate-status success';
+        btn.disabled = false;
+      },
+      onCancel: () => {
+        status.textContent = '취소되었습니다.';
+        status.className = 'donate-status';
+        btn.disabled = false;
+      },
+      onError: (err) => {
+        status.textContent = '오류: ' + (err.message || err);
+        status.className = 'donate-status error';
+        btn.disabled = false;
+      }
+    });
+  } catch(e) {
+    status.textContent = '오류: ' + e.message;
+    status.className = 'donate-status error';
+    btn.disabled = false;
+  }
+}
+
 buildGrid();
 fetchAll();
 setInterval(fetchAll, 60000);
